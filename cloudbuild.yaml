@@ -1,0 +1,46 @@
+# Google Cloud Build — build image, push to Artifact Registry, deploy to Cloud Run
+#
+# Prerequisites (run once):
+#   gcloud services enable artifactregistry.googleapis.com run.googleapis.com cloudbuild.googleapis.com
+#   gcloud artifacts repositories create shipping-calculator --repository-format=docker --location=europe-west1
+#
+# GitHub trigger: Cloud Console → Cloud Build → Triggers → connect repo → branch main → config cloudbuild.yaml
+#
+# Manual run (set SHORT_SHA if not using a GitHub trigger):
+#   gcloud builds submit --config=cloudbuild.yaml --substitutions=SHORT_SHA=$(git rev-parse --short HEAD) .
+
+substitutions:
+  _REGION: europe-west1
+  _AR_REPO: shipping-calculator
+  _SERVICE_NAME: shipping-calculator
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+steps:
+  - id: build-and-push
+    name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE_NAME}:$SHORT_SHA'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE_NAME}:latest'
+      - .
+
+  - id: deploy
+    name: gcr.io/google.com/cloudsdks/gcloud
+    args:
+      - run
+      - deploy
+      - '${_SERVICE_NAME}'
+      - '--image=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE_NAME}:$SHORT_SHA'
+      - '--region=${_REGION}'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+      - '--port=8080'
+      - '--set-env-vars=NEXT_TELEMETRY_DISABLED=1'
+
+images:
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE_NAME}:$SHORT_SHA'
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE_NAME}:latest'
