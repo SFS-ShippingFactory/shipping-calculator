@@ -32,9 +32,10 @@ function ThemeToggle() {
     <button
       type="button"
       onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-      className="rounded-lg border border-gray-200 p-2 text-gray-600 transition-colors hover:bg-gray-100 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-800"
+      className="rounded-lg border border-gray-200 p-2 text-gray-500 transition-colors hover:bg-gray-100 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-800"
+      aria-label="Toggle theme"
     >
-      {theme === 'dark' ? <PiSunBold className="size-5" /> : <PiMoonBold className="size-5" />}
+      {theme === 'dark' ? <PiSunBold className="size-4" /> : <PiMoonBold className="size-4" />}
     </button>
   )
 }
@@ -52,19 +53,23 @@ export default function ShippingCalculatorPage() {
 
   return (
     <div className="@container">
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      {/* Header */}
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-xl font-bold">Shipping Calculator</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="text-2xl font-bold tracking-tight">
+            Shipping Calculator
+          </h1>
+          <p className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
             Compare shipping costs across carriers and services
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <CurrencyBadge />
           <ThemeToggle />
         </div>
       </div>
 
+      {/* Tabs */}
       <Tab>
         <Tab.List>
           {tabs.map((tab) => (
@@ -73,7 +78,11 @@ export default function ShippingCalculatorPage() {
               onClick={() => setActiveTab(tab.key)}
             >
               {({ selected }) => (
-                <span className={`flex items-center gap-1.5 ${selected ? 'font-semibold' : ''}`}>
+                <span
+                  className={`flex items-center gap-1.5 text-sm ${
+                    selected ? 'font-semibold' : 'text-gray-500'
+                  }`}
+                >
                   <tab.icon className="size-4" />
                   {tab.label}
                 </span>
@@ -81,7 +90,7 @@ export default function ShippingCalculatorPage() {
             </Tab.ListItem>
           ))}
         </Tab.List>
-        <Tab.Panels className="mt-4">
+        <Tab.Panels className="mt-5">
           <Tab.Panel>
             <CalculatorTab />
           </Tab.Panel>

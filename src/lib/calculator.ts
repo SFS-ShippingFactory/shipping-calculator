@@ -140,23 +140,31 @@ export function calculateService(
   }
 }
 
+export function isHazmatService(service: Service): boolean {
+  const t = service.type.toLowerCase()
+  const n = service.name.toLowerCase()
+  return t.includes('dg') || t.includes('hazmat') || n.includes('battery') || n.includes('dg')
+}
+
 export function calculateAll(
   carriers: Record<string, Carrier>,
   lCm: number,
   wCm: number,
   hCm: number,
   weightKg: number,
-  carrierFilter: string,
-  countryFilter: string
+  selectedCarriers: string[],
+  countryFilter: string,
+  showHazmat: boolean = true
 ): CalculationResult[] {
   const results: CalculationResult[] = []
 
   Object.values(carriers).forEach((carrier) => {
     if (!carrier.isActive) return
-    if (carrierFilter !== 'all' && carrier.id !== carrierFilter) return
+    if (!selectedCarriers.includes(carrier.id)) return
 
     carrier.services.forEach((service) => {
       if (!service.isActive) return
+      if (!showHazmat && isHazmatService(service)) return
       if (countryFilter !== 'all') {
         if (service.country && service.country !== countryFilter) return
         if (!service.country) return

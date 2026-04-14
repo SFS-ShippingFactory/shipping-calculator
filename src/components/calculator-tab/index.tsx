@@ -16,8 +16,9 @@ export function CalculatorTab() {
   const {
     carriers,
     packageInput,
-    carrierFilter,
+    selectedCarriers,
     countryFilter,
+    showHazmat,
     selectedServices,
   } = useShippingCalculatorStore()
 
@@ -33,17 +34,17 @@ export function CalculatorTab() {
 
     if (l <= 0 && w <= 0 && h <= 0 && weight <= 0) return []
 
-    const all = calculateAll(carriers, l, w, h, weight, carrierFilter, countryFilter)
+    const all = calculateAll(carriers, l, w, h, weight, selectedCarriers, countryFilter, showHazmat)
     return all.filter((r) => selectedServices.includes(r.serviceId))
-  }, [carriers, packageInput, carrierFilter, countryFilter, selectedServices])
+  }, [carriers, packageInput, selectedCarriers, countryFilter, showHazmat, selectedServices])
 
   const summary = useMemo(() => getComparisonSummary(results), [results])
 
   return (
-    <div className="space-y-6">
-      <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900">
+    <div className="space-y-5">
+      <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-900">
         <QuickPresets />
-        <div className="mt-4">
+        <div className="mt-4 border-t border-gray-100 pt-4 dark:border-gray-800">
           <PackageForm />
         </div>
       </div>

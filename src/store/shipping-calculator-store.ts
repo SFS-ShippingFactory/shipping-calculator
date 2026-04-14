@@ -13,8 +13,9 @@ interface ShippingCalculatorStore {
 
   packageInput: PackageInput
   activePreset: string
-  carrierFilter: string
+  selectedCarriers: string[]
   countryFilter: string
+  showHazmat: boolean
   activeTab: string
 
   addCarrier: (carrier: Carrier) => void
@@ -36,8 +37,10 @@ interface ShippingCalculatorStore {
   setLastResults: (results: CalculationResult[]) => void
   setPackageInput: (input: Partial<PackageInput>) => void
   setActivePreset: (preset: string) => void
-  setCarrierFilter: (filter: string) => void
+  toggleCarrierFilter: (carrierId: string) => void
+  selectAllCarrierFilters: () => void
   setCountryFilter: (filter: string) => void
+  setShowHazmat: (show: boolean) => void
   setActiveTab: (tab: string) => void
 
   importCarriers: (data: Record<string, Carrier>) => void
@@ -65,8 +68,9 @@ export const useShippingCalculatorStore = create<ShippingCalculatorStore>()(
         dimUnit: 'cm', weightUnit: 'kg', quantity: 1, frequency: 'once',
       },
       activePreset: 'custom',
-      carrierFilter: 'all',
+      selectedCarriers: Object.keys(DEFAULT_CARRIERS),
       countryFilter: 'all',
+      showHazmat: true,
       activeTab: 'calculator',
 
       addCarrier: (carrier) =>
@@ -174,8 +178,16 @@ export const useShippingCalculatorStore = create<ShippingCalculatorStore>()(
       setLastResults: (results) => set({ lastResults: results }),
       setPackageInput: (input) => set((state) => ({ packageInput: { ...state.packageInput, ...input } })),
       setActivePreset: (preset) => set({ activePreset: preset }),
-      setCarrierFilter: (filter) => set({ carrierFilter: filter }),
+      toggleCarrierFilter: (carrierId) =>
+        set((state) => ({
+          selectedCarriers: state.selectedCarriers.includes(carrierId)
+            ? state.selectedCarriers.filter((id) => id !== carrierId)
+            : [...state.selectedCarriers, carrierId],
+        })),
+      selectAllCarrierFilters: () =>
+        set((state) => ({ selectedCarriers: Object.keys(state.carriers) })),
       setCountryFilter: (filter) => set({ countryFilter: filter }),
+      setShowHazmat: (show) => set({ showHazmat: show }),
       setActiveTab: (tab) => set({ activeTab: tab }),
 
       importCarriers: (data) =>
@@ -192,10 +204,11 @@ export const useShippingCalculatorStore = create<ShippingCalculatorStore>()(
       partialize: (state) => ({
         carriers: state.carriers,
         selectedServices: state.selectedServices,
+        selectedCarriers: state.selectedCarriers,
         packageInput: state.packageInput,
         activePreset: state.activePreset,
-        carrierFilter: state.carrierFilter,
         countryFilter: state.countryFilter,
+        showHazmat: state.showHazmat,
         activeTab: state.activeTab,
       }),
     }

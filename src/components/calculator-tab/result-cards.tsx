@@ -1,8 +1,9 @@
 'use client'
 
 import { Badge, Text, Tooltip } from 'rizzui'
+import { PiWarningDiamondBold } from 'react-icons/pi'
 import type { CalculationResult, ComparisonSummary, Frequency } from '@/lib/types'
-import { formatRMB, formatUSD, formatWeight, rmbToUsd } from '@/lib/calculator'
+import { formatRMB, formatUSD, formatWeight, rmbToUsd, isHazmatService } from '@/lib/calculator'
 import { COUNTRY_NAMES } from '@/lib/constants'
 import { useShippingCalculatorStore } from '@/store/shipping-calculator-store'
 import { cn } from '@/lib/cn'
@@ -88,7 +89,16 @@ export function ResultCards({ results, summary, quantity, frequency }: Props) {
 
             {/* Header */}
             <div className="mb-3 pr-16">
-              <Text className="text-sm font-semibold">{r.serviceName}</Text>
+              <div className="flex items-center gap-1.5">
+                <Text className="text-sm font-semibold">{r.serviceName}</Text>
+                {(r.type.toLowerCase().includes('dg') || r.serviceName.toLowerCase().includes('battery')) && (
+                  <Tooltip content="Hazmat / Dangerous Goods" placement="top">
+                    <span className="inline-flex items-center rounded bg-amber-100 px-1 py-0.5 dark:bg-amber-900/30">
+                      <PiWarningDiamondBold className="size-3 text-amber-600 dark:text-amber-400" />
+                    </span>
+                  </Tooltip>
+                )}
+              </div>
               <Text className="text-xs text-gray-500">
                 {r.carrierName} · {r.code}
                 {countryLabel && ` · ${countryLabel}`}

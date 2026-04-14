@@ -20,8 +20,9 @@ export function CompareTab() {
   const {
     carriers,
     packageInput,
-    carrierFilter,
+    selectedCarriers,
     countryFilter,
+    showHazmat,
     selectedServices,
     exchangeRate,
   } = useShippingCalculatorStore()
@@ -36,8 +37,8 @@ export function CompareTab() {
       packageInput.weightUnit
     )
     if (l <= 0 && w <= 0 && h <= 0 && weight <= 0) return []
-    return calculateAll(carriers, l, w, h, weight, carrierFilter, countryFilter)
-  }, [carriers, packageInput, carrierFilter, countryFilter])
+    return calculateAll(carriers, l, w, h, weight, selectedCarriers, countryFilter, showHazmat)
+  }, [carriers, packageInput, selectedCarriers, countryFilter, showHazmat])
 
   const visibleResults = useMemo(
     () => results.filter((r) => selectedServices.includes(r.serviceId)),
